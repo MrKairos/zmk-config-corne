@@ -15,6 +15,7 @@
         combo_game {
             bindings = <&tog 6>;
             key-positions = <36 41>;
+            timeout-ms = <200>;
         };
     };
 
