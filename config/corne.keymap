@@ -93,28 +93,28 @@
 
         layer_1 {
             bindings = <
-&trans     &kp N1  &kp N2  &kp N3      &kp N4       &kp N5               &kp N6     &kp N7          &kp N8          &kp N9           &kp N0  &trans
-&trans     &trans  &trans  &trans      &trans       &kp C_VOLUME_UP      &trans     &kp LEFT_ARROW  &kp UP_ARROW    &kp RIGHT_ARROW  &trans  &trans
-&kp LSHFT  &trans  &trans  &kp K_COPY  &kp K_PASTE  &kt C_VOLUME_DOWN    &trans     &trans          &kp DOWN_ARROW  &trans           &trans  &trans
-                           &trans      &sl 1        &kp SPACE            &kt ENTER  &sl 2           &trans
+&kp GRAVE  &kp N1  &kp N2  &kp N3        &kp N4       &kp N5               &kp N6     &kp N7          &kp N8          &kp N9           &kp N0     &kp BSPC
+&trans     &trans  &trans  &trans        &trans       &kp C_VOLUME_UP      &trans     &kp LEFT_ARROW  &kp UP_ARROW    &kp RIGHT_ARROW  &kp MINUS  &kp EQUAL
+&kp LSHFT  &trans  &trans  &kp K_COPY    &kp K_PASTE  &kt C_VOLUME_DOWN    &kt HOME   &kp END         &kp DOWN_ARROW  &trans           &trans     &trans
+                           &kp LEFT_WIN  &sl 1        &kp SPACE            &kt ENTER  &sl 2           &trans
             >;
         };
 
         layer_2 {
             bindings = <
-&kp F1  &kp F2  &kp F3  &kp F4  &kp F5  &kp F6    &kp F7  &kp F8  &kp F9  &kp F10  &kp F11  &kp F12
-&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans   &trans   &kp PAGE_UP
-&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans   &trans   &kp PAGE_DOWN
+&kp F1  &kp F2  &kp F3  &kp F4  &kp F5  &kp F6    &kp F7  &kp F8  &kp F9    &kp F10   &kp F11   &kp F12
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &kp LBKT  &kp RBKT  &kp BSLH  &kp PAGE_UP
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans    &trans    &trans    &kp PAGE_DOWN
                         &trans  &trans  &trans    &trans  &trans  &trans
             >;
         };
 
         d2 {
             bindings = <
-&kp ESC  &kp F1  &kp F2  &kp F3  &kp F4  &kp F5    &trans  &trans  &trans  &trans  &trans  &trans
-&trans   &kp N1  &kp N2  &kp N3  &kp N4  &kp P     &trans  &trans  &trans  &trans  &trans  &trans
-&trans   &kp A   &trans  &kp B   &kp I   &kp T     &trans  &trans  &trans  &trans  &trans  &trans
-                         &trans  &trans  &trans    &trans  &trans  &trans
+&kp ESC    &kp F1  &kp F2  &kp F3  &kp F4  &kp F5    &trans  &trans  &trans  &trans  &trans  &trans
+&kp TAB    &kp N1  &kp N2  &kp N3  &kp N4  &kp P     &trans  &trans  &trans  &trans  &trans  &trans
+&kp RCTRL  &kp A   &kt H   &kp B   &kp I   &kp T     &trans  &trans  &trans  &trans  &trans  &trans
+                           &trans  &trans  &trans    &trans  &trans  &trans
             >;
         };
     };
