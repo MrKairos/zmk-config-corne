@@ -80,6 +80,22 @@
         };
     };
 
+    macros {
+        copy: new_macro {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp RCTRL &kp C>;
+            label = "NEW_MACRO";
+        };
+
+        past: past {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp RCTRL &kp V>;
+            label = "PAST";
+        };
+    };
+
     keymap {
         compatible = "zmk,keymap";
 
@@ -94,10 +110,10 @@
 
         layer_1 {
             bindings = <
-&kp GRAVE  &kp N1  &kp N2  &kp N3         &kp N4          &kp N5               &kp N6     &kp N7          &kp N8          &kp N9           &kp N0     &kp BSPC
-&trans     &trans  &trans  &trans         &trans          &kp C_VOLUME_UP      &trans     &kp LEFT_ARROW  &kp UP_ARROW    &kp RIGHT_ARROW  &kp MINUS  &kp EQUAL
-&kp LSHFT  &trans  &trans  &kp C_AC_COPY  &kp C_AC_PASTE  &kp C_VOLUME_DOWN    &kt HOME   &kp END         &kp DOWN_ARROW  &trans           &trans     &trans
-                           &kp LEFT_WIN   &lt 1 TAB       &kp SPACE            &kt ENTER  &lt 2 TAB       &trans
+&kp GRAVE  &kp N1  &kp N2  &kp N3        &kp N4     &kp N5               &kp N6     &kp N7          &kp N8          &kp N9           &kp N0     &kp BSPC
+&trans     &trans  &trans  &trans        &trans     &kp C_VOLUME_UP      &trans     &kp LEFT_ARROW  &kp UP_ARROW    &kp RIGHT_ARROW  &kp MINUS  &kp EQUAL
+&kp LSHFT  &trans  &trans  &copy         &past      &kp C_VOLUME_DOWN    &kt HOME   &kp END         &kp DOWN_ARROW  &trans           &trans     &trans
+                           &kp LEFT_WIN  &lt 1 TAB  &kp SPACE            &kt ENTER  &lt 2 TAB       &trans
             >;
         };
 
