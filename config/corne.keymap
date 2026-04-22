@@ -2,6 +2,15 @@
  * Copyright (c) 2020 The ZMK Contributors
  *
  * SPDX-License-Identifier: MIT
+ *
+ * Раскладка: MrKairos, редакция под Windows
+ * Профиль использования:
+ *   - Русский + английский набор (ЙЦУКЕН символы сохранены на base)
+ *   - Код: TypeScript, C#, GDScript
+ *   - Markdown
+ *   - Google Sheets (F4 для $-фиксации)
+ *
+ * Layout большой пальцев: LGUI | LT1 TAB | SPACE || ENTER | LT2 TAB | BSPC
  */
 
 #define ZMK_POINTING_DEFAULT_MOVE_VAL 1500  // default: 600
@@ -10,119 +19,166 @@
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/pointing.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/outputs.h>
+
+// Номера слоёв - для читаемости
+#define BASE 0
+#define LOWER 1
+#define RAISE 2
+#define ADJUST 3
 
 / {
     combos {
         compatible = "zmk,combos";
 
-        combo_game {
-            bindings = <&tog 0>;
+        // J+K = Caps Word (следующее слово КАПСОМ, авто-выкл на пробеле)
+        // Удобно для CONSTANTS_LIKE_THIS в C# / GDScript
+        combo_caps_word {
+            bindings = <&caps_word>;
+            key-positions = <19 20>;
+            timeout-ms = <50>;
+            layers = <BASE>;
+        };
+
+        // Одновременное удержание обоих LT-клавиш = слой ADJUST (функции, BT, медиа)
+        // Позиции 37 (LT1 TAB) + 40 (LT2 TAB) - оба больших пальца
+        combo_adjust {
+            bindings = <&mo ADJUST>;
             key-positions = <37 40>;
-            timeout-ms = <200>;
-        };
-    };
-
-    behaviors {
-        hml: hml {
-            compatible = "zmk,behavior-hold-tap";
-            label = "HML";
-            bindings = <&kp>, <&kp>;
-
-            #binding-cells = <2>;
-            tapping-term-ms = <220>;
-            quick-tap-ms = <175>;
-            flavor = "balanced";
-            require-prior-idle-ms = <100>;
-            hold-trigger-key-positions = <39 40 41 30 18 6 7 9 10 11 18 19 20 21 22 23 30 31 32 33 34 35 40 41 8 36 37 38>;
-            hold-trigger-on-release;
-        };
-
-        hmr: hmr {
-            compatible = "zmk,behavior-hold-tap";
-            label = "HMR";
-            bindings = <&kp>, <&kp>;
-
-            #binding-cells = <2>;
-            tapping-term-ms = <220>;
-            quick-tap-ms = <175>;
-            require-prior-idle-ms = <100>;
-            flavor = "balanced";
-            hold-trigger-key-positions = <0 1 2 3 4 5 12 13 14 15 16 17 24 25 26 27 28 29 36 37 38 39 40 41>;
-            hold-trigger-on-release;
-        };
-
-        tkl: tkl {
-            compatible = "zmk,behavior-hold-tap";
-            label = "TKL";
-            bindings = <&mo>, <&kp>;
-
-            #binding-cells = <2>;
-            tapping-term-ms = <220>;
-            quick-tap-ms = <175>;
-            flavor = "balanced";
-            require-prior-idle-ms = <100>;
-            hold-trigger-key-positions = <39 40 41 30 18 6 7 9 10 11 18 19 20 21 22 23 30 31 32 33 34 35 40 41 8 38 37 36>;
-            hold-trigger-on-release;
-        };
-
-        tkr: tkr {
-            compatible = "zmk,behavior-hold-tap";
-            label = "TKR";
-            bindings = <&mo>, <&kp>;
-
-            #binding-cells = <2>;
-            tapping-term-ms = <220>;
-            quick-tap-ms = <175>;
-            require-prior-idle-ms = <100>;
-            flavor = "balanced";
-            hold-trigger-key-positions = <0 1 2 3 4 5 12 13 14 15 16 17 24 25 26 27 28 29 36 37 38 39 40 41>;
-            hold-trigger-on-release;
+            timeout-ms = <50>;
         };
     };
 
     macros {
-        copy: new_macro {
+        // Ctrl+C - исправленная версия (модификатор держится пока жмётся буква)
+        cpy: cpy {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings = <&kp RCTRL &kp C>;
-            label = "NEW_MACRO";
+            bindings
+                = <&macro_press &kp LCTRL>
+                , <&macro_tap &kp C>
+                , <&macro_release &kp LCTRL>;
+            label = "CPY";
         };
 
-        past: past {
+        // Ctrl+V
+        pst: pst {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings = <&kp RCTRL &kp V>;
-            label = "PAST";
+            bindings
+                = <&macro_press &kp LCTRL>
+                , <&macro_tap &kp V>
+                , <&macro_release &kp LCTRL>;
+            label = "PST";
+        };
+
+        // Markdown: тройной backtick для блока кода ```
+        md_code: md_code {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp GRAVE &kp GRAVE &kp GRAVE>;
+            label = "MD_CODE";
+        };
+
+        // Markdown: ** ** для жирного, курсор остаётся между звёздочками
+        md_bold: md_bold {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings
+                = <&kp KP_MULTIPLY &kp KP_MULTIPLY &kp KP_MULTIPLY &kp KP_MULTIPLY &kp LEFT &kp LEFT>;
+            label = "MD_BOLD";
         };
     };
 
     keymap {
         compatible = "zmk,keymap";
 
+        // ──────────────────────────────────────────────────────────────
+        // BASE - QWERTY, стандартная русская ЙЦУКЕН совместимость
+        // ──────────────────────────────────────────────────────────────
+        //  TAB  |  Q  |  W  |  E  |  R  |  T  |   |  Y  |  U  |  I  |  O  |  P  | BSPC |
+        //  SHFT |  A  |  S  |  D  |  F  |  G  |   |  H  |  J  |  K  |  L  |  ;  |  '   |
+        //  CTRL |  Z  |  X  |  C  |  V  |  B  |   |  N  |  M  |  ,  |  .  |  /  |  `   |
+        //              | GUI | L1  | SPC |   | ENT | L2  | BSPC |
+        //
+        // Ключевые изменения vs ваш оригинал:
+        //   * правый верхний угол: DELETE -> BSPC (Delete доступен на слое 1)
+        //   * символы [  ]  ;  '  ,  .  /  `  сохранены на физических позициях,
+        //     чтобы русская раскладка работала нормально (х, ъ, ж, э, б, ю, ё)
+        // ──────────────────────────────────────────────────────────────
         base {
             bindings = <
-&kp TAB    &kp Q  &kp W  &kp E     &kp R      &kp T        &kp Y      &kp U      &kp I          &kp O    &kp P     &kp BSPC
-&kp LSHFT  &kp A  &kp S  &kp D     &kp F      &kp G        &kp H      &kp J      &kp K          &kp L    &kp SEMI  &kp APOS
-&kp LCTRL  &kp Z  &kp X  &kp C     &kp V      &kp B        &kp N      &kp M      &kp COMMA      &kp DOT  &kp FSLH  &kp GRAVE
-                         &kp LGUI  &lt 1 TAB  &kp SPACE    &kp ENTER  &lt 2 TAB  &kp BACKSPACE
+&kp TAB    &kp Q  &kp W  &kp E     &kp R      &kp T        &kp Y      &kp U          &kp I         &kp O    &kp P     &kp BSPC
+&kp LSHFT  &kp A  &kp S  &kp D     &kp F      &kp G        &kp H      &kp J          &kp K         &kp L    &kp SEMI  &kp APOS
+&kp LCTRL  &kp Z  &kp X  &kp C     &kp V      &kp B        &kp N      &kp M          &kp COMMA     &kp DOT  &kp FSLH  &kp GRAVE
+                         &kp LGUI  &lt 1 TAB  &kp SPACE    &kp ENTER  &lt 2 TAB      &kp BSPC
             >;
         };
 
-        layer_1 {
+        // ──────────────────────────────────────────────────────────────
+        // LOWER (слой 1) - цифры, навигация, функции для Sheets
+        // ──────────────────────────────────────────────────────────────
+        //  ESC  |  1  |  2  |  3  |  4  |  5  |   |  6  |  7  |  8  |  9  |  0  | DEL  |
+        //  SHFT |F1-F5 group  | RCL | LCL |PG_UP|   |LEFT |DOWN | UP  |RGHT |HOME | END  |
+        //  CTRL | CPY | PST |     |MCLK |PG_DN|   | F4  | F11 |PG_UP|PG_DN| INS |CAPS  |
+        //              | GUI |     | SPC |   | ENT | L2  | BSPC |
+        //
+        // F4 - критичная клавиша для Google Sheets ($-фиксация ссылок)
+        // CPY/PST - ваши макросы Ctrl+C / Ctrl+V (исправленные)
+        // ──────────────────────────────────────────────────────────────
+        lower {
             bindings = <
-&kp ESC    &kp N1  &kp N2  &kp N3        &kp N4     &kp N5       &kp N6     &kp N7          &kp N8          &kp N9           &kp N0     &kp DELETE
-&kp LSHFT  &trans  &trans  &mkp RCLK     &mkp LCLK  &kp LPAR     &kp RPAR   &kp LEFT_ARROW  &kp UP_ARROW    &kp RIGHT_ARROW  &kp MINUS  &kp EQUAL
-&kp LCTRL  &trans  &trans  &mkp MCLK     &kp LBKT   &kp LBRC     &kp RBRC   &kp RBKT        &kp DOWN_ARROW  &trans           &kp HOME   &kp END
-                           &kp LEFT_WIN  &lt 1 TAB  &kp SPACE    &kp ENTER  &lt 2 TAB       &trans
+&kp ESC    &kp N1  &kp N2  &kp N3     &kp N4     &kp N5          &kp N6     &kp N7     &kp N8    &kp N9    &kp N0    &kp DEL
+&kp LSHFT  &kp F1  &kp F2  &mkp RCLK  &mkp LCLK  &kp PG_UP       &kp LEFT   &kp DOWN   &kp UP    &kp RIGHT &kp HOME  &kp END
+&kp LCTRL  &cpy    &pst    &trans     &mkp MCLK  &kp PG_DN       &kp F4     &kp F11    &kp PG_UP &kp PG_DN &kp INS   &kp CAPS
+                           &kp LGUI   &trans     &kp SPACE       &kp ENTER  &mo 3      &kp DEL
             >;
         };
 
-        layer_2 {
+        // ──────────────────────────────────────────────────────────────
+        // RAISE (слой 2) - символы: Markdown + код + Sheets
+        // ──────────────────────────────────────────────────────────────
+        //  TAB  |  !  |  @  |  #  |  $  |  %  |   |  ^  |  &  |  *  |  (  |  )  | BSPC |
+        //  SHFT |  `  |  ~  |  _  |  -  |  +  |   |  =  |  {  |  }  |  [  |  ]  |  |   |
+        //  CTRL | TAB3|MDCOD|MDBLD|  \  | "   |   |  <  |  >  |  ,  |  .  |  /  |  ?   |
+        //              | GUI | L1  | SPC |   | ENT |     | BSPC |
+        //
+        // Логика расположения:
+        //   - шифт-символы верхнего ряда 1-0 в том же порядке (! @ # $ % ^ & * ( ))
+        //   - ВСЕ скобки (){}[] в правой половине, пары рядом
+        //   - = < > группой для операторов и =>  <=  >=
+        //   - # * _ ~ для Markdown выделения
+        //   - $ для Sheets, | для Markdown таблиц
+        //   - MDCOD = тройной ``` для блока кода
+        //   - MDBLD = **|** с курсором между звёздочек
+        // ──────────────────────────────────────────────────────────────
+        raise {
             bindings = <
-&kp F1  &kp F2  &kp F3  &kp F4  &kp F5     &kp F6    &kp F7             &kp F8     &kp F9           &kp F10   &kp F11   &kp F12
-&trans  &trans  &trans  &trans  &trans     &trans    &kp C_VOLUME_UP    &trans     &kp LBKT         &kp RBKT  &kp BSLH  &kp PAGE_UP
-&trans  &trans  &trans  &trans  &trans     &trans    &kp C_VOLUME_DOWN  &trans     &trans           &trans    &trans    &kp PAGE_DOWN
-                        &trans  &lt 1 TAB  &trans    &trans             &lt 2 TAB  &kp PRINTSCREEN
+&kp TAB    &kp EXCL   &kp AT    &kp HASH    &kp DLLR   &kp PRCNT     &kp CARET  &kp AMPS   &kp ASTRK  &kp LPAR  &kp RPAR  &kp BSPC
+&kp LSHFT  &kp GRAVE  &kp TILDE &kp UNDER   &kp MINUS  &kp PLUS      &kp EQUAL  &kp LBRC   &kp RBRC   &kp LBKT  &kp RBKT  &kp PIPE
+&kp LCTRL  &md_code   &md_bold  &kp BSLH    &kp DQT    &kp SQT       &kp LT     &kp GT     &kp COMMA  &kp DOT   &kp FSLH  &kp QMARK
+                                &kp LGUI    &mo 3      &kp SPACE     &kp ENTER  &trans     &kp BSPC
+            >;
+        };
+
+        // ──────────────────────────────────────────────────────────────
+        // ADJUST (слой 3) - редко: F-ряд, Bluetooth, медиа, управление
+        // ──────────────────────────────────────────────────────────────
+        // Вызывается комбо "оба больших пальца одновременно"
+        // или удержанием L1+L2 через &mo 3 на соседнем слое
+        //
+        //  RST  | F1  | F2  | F3  | F4  | F5  |   | F6  | F7  | F8  | F9  | F10 | F11  |
+        //       | BT1 | BT2 | BT3 | BT4 | BT5 |   |     |VOL- |VOL+ |MUTE |PREV |NEXT  |
+        // BTCLR|USBOUT|BTOUT|     |     |     |   |     |BRDN |BRUP |PLAY |STOP | F12  |
+        //              |     |     |     |   |     |     |      |
+        // ──────────────────────────────────────────────────────────────
+        adjust {
+            bindings = <
+&sys_reset    &kp F1        &kp F2        &kp F3        &kp F4        &kp F5              &kp F6    &kp F7        &kp F8           &kp F9        &kp F10           &kp F11
+&trans        &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4        &trans    &kp C_VOL_DN  &kp C_VOL_UP     &kp C_MUTE    &kp C_PREV        &kp C_NEXT
+&bt BT_CLR    &out OUT_USB  &out OUT_BLE  &trans        &trans        &trans              &trans    &kp C_BRI_DN  &kp C_BRI_UP     &kp C_PP      &kp C_STOP        &kp F12
+                                          &trans        &trans        &trans              &trans    &trans        &trans
             >;
         };
     };
